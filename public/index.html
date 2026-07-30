@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Райхан Шашлык — Управление кафе</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-hover: #1f2b47;
+            --accent: #e94560;
+            --accent-hover: #ff6b6b;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0b8;
+            --success: #00d9a5;
+            --warning: #ffc107;
+            --danger: #ff4757;
+            --info: #00d2ff;
+            --border: rgba(255,255,255,0.08);
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(233, 69, 96, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 210, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 217, 165, 0.05) 0%, transparent 50%);
+        }
+        .bg-animation::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: bgMove 60s linear infinite;
+        }
+        @keyframes bgMove { 0% { transform: translate(0, 0); } 100% { transform: translate(60px, 60px); } }
+
+        .login-screen {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 48px 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow);
+            backdrop-filter: blur(20px); position: relative; overflow: hidden;
+        }
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--info), var(--success));
+        }
+        .login-logo { text-align: center; margin-bottom: 32px; }
+        .login-logo i { font-size: 48px; color: var(--accent); margin-bottom: 16px; display: block; }
+        .login-logo h2 {
+            font-weight: 800; font-size: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .login-logo p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+        .form-floating { margin-bottom: 16px; }
+        .form-floating .form-control {
+            background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);
+            border-radius: 12px; height: 56px; padding: 16px 16px 8px;
+        }
+        .form-floating .form-control:focus {
+            background: var(--bg-secondary); border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.15); color: var(--text-primary);
+        }
+        .form-floating label { color: var(--text-secondary); padding-left: 16px; }
+        .btn-login {
+            width: 100%; padding: 14px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white; font-weight: 600; font-size: 16px; transition: all 0.3s ease; margin-top: 8px;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4); }
+        .remember-me {
+            display: flex; align-items: center; gap: 8px; margin: 16px 0;
+            color: var(--text-secondary); font-size: 14px; cursor: pointer;
+        }
+        .remember-me input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+        .error-msg { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; min-height: 20px; font-weight: 500; }
+
+        .app-container { display: none; min-height: 100vh; }
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: 260px; height: 100vh;
+            background: var(--bg-secondary); border-right: 1px solid var(--border);
+            z-index: 1000; transition: all 0.3s ease; display: flex; flex-direction: column;
+        }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border); }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 800; font-size: 20px; color: var(--text-primary);
+        }
+        .sidebar-brand i { color: var(--accent); font-size: 28px; }
+        .sidebar-brand span {
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 12px; color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+            margin-bottom: 4px; cursor: pointer; border: none; background: none;
+            width: 100%; text-align: left;
+        }
+        .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.15), rgba(0, 210, 255, 0.1));
+            color: var(--accent); border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+        .nav-item i { width: 24px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+        .user-info {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            border-radius: 10px; background: var(--bg-primary);
+        }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; color: white;
+        }
+        .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .user-role { font-size: 11px; color: var(--text-secondary); }
+        .btn-logout {
+            background: none; border: none; color: var(--text-secondary);
+            cursor: pointer; padding: 6px; border-radius: 6px; transition: all 0.2s;
+        }
+        .btn-logout:hover { color: var(--danger); background: rgba(255, 71, 87, 0.1); }
+
+        .main-content { margin-left: 260px; padding: 24px 32px; min-height: 100vh; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .page-header p { color: var(--text-secondary); font-size: 14px; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; position: relative; overflow: hidden; transition: all 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: rgba(233, 69, 96, 0.2); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .stat-card.revenue::before { background: var(--success); }
+        .stat-card.profit::before { background: var(--info); }
+        .stat-card.expense::before { background: var(--warning); }
+        .stat-card.orders::before { background: var(--accent); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px;
+        }
+        .stat-card.revenue .stat-icon { background: rgba(0, 217, 165, 0.15); color: var(--success); }
+        .stat-card.profit .stat-icon { background: rgba(0, 210, 255, 0.15); color: var(--info); }
+        .stat-card.expense .stat-icon { background: rgba(255, 193, 7, 0.15); color: var(--warning); }
+        .stat-card.orders .stat-icon { background: rgba(233, 69, 96, 0.15); color: var(--accent); }
+        .stat-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .stat-change { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        .content-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; margin-bottom: 24px;
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; }
+        .card-actions { display: flex; gap: 8px; }
+        .btn-sm {
+            padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;
+            font-weight: 500; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-sm:hover { background: var(--bg-hover); border-color: var(--accent); }
+        .btn-sm.btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border: none; color: white;
+        }
+        .btn-sm.btn-primary:hover { box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3); }
+
+        .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .calc-item {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; transition: all 0.3s;
+        }
+        .calc-item:hover { border-color: rgba(233, 69, 96, 0.3); transform: translateY(-2px); }
+        .calc-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .calc-item-name { font-weight: 600; font-size: 15px; }
+        .calc-item-price { font-size: 13px; color: var(--success); font-weight: 600; }
+        .calc-input-group { display: flex; gap: 8px; align-items: center; }
+        .calc-input {
+            flex: 1; background: var(--bg-primary); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 14px; color: var(--text-primary);
+            font-size: 14px; outline: none; transition: all 0.2s;
+        }
+        .calc-input:focus { border-color: var(--accent); }
+        .calc-result { min-width: 80px; text-align: right; font-weight: 700; color: var(--info); font-size: 15px; }
+        .calc-total {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(0, 210, 255, 0.1));
+            border: 1px solid rgba(233, 69, 96, 0.2); border-radius: 12px;
+            padding: 20px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .calc-total-label { font-size: 16px; font-weight: 600; }
+        .calc-total-value {
+            font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .table-modern { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-modern th {
+            text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .table-modern td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .table-modern tr:hover td { background: var(--bg-hover); }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: rgba(0, 217, 165, 0.15); color: var(--success); }
+        .badge-warning { background: rgba(255, 193, 7, 0.15); color: var(--warning); }
+
+        .recipe-card {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; transition: all 0.3s;
+        }
+        .recipe-card:hover {
+            border-color: rgba(233, 69, 96, 0.3); transform: translateY(-4px); box-shadow: var(--shadow);
+        }
+        .recipe-header {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(0, 210, 255, 0.05));
+            border-bottom: 1px solid var(--border);
+        }
+        .recipe-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .recipe-title i { color: var(--accent); }
+        .recipe-body { padding: 20px; }
+        .recipe-ingredient {
+            display: flex; justify-content: space-between; padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px;
+        }
+        .recipe-ingredient:last-child { border-bottom: none; }
+        .recipe-ingredient-name { color: var(--text-secondary); }
+        .recipe-ingredient-value { font-weight: 600; color: var(--text-primary); }
+
+        .settings-group { margin-bottom: 24px; }
+        .settings-label {
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+        }
+        .settings-row {
+            display: grid; grid-template-columns: 1fr 1fr 120px; gap: 12px;
+            align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-input {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 14px; color: var(--text-primary);
+            font-size: 14px; outline: none; width: 100%;
+        }
+        .settings-input:focus { border-color: var(--accent); }
+
+        .toast-container {
+            position: fixed; top: 24px; right: 24px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+            min-width: 300px; box-shadow: var(--shadow); animation: toastSlide 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+        @keyframes toastSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-icon {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        .toast-success .toast-icon { background: rgba(0, 217, 165, 0.15); color: var(--success); }
+        .toast-error .toast-icon { background: rgba(255, 71, 87, 0.15); color: var(--danger); }
+        .toast-info .toast-icon { background: rgba(0, 210, 255, 0.15); color: var(--info); }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; font-size: 14px; }
+        .toast-message { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+        .mobile-toggle {
+            display: none; position: fixed; top: 20px; left: 20px; z-index: 1001;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 10px 14px; color: var(--text-primary); cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 80px 16px 24px; }
+            .mobile-toggle { display: block; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .settings-row { grid-template-columns: 1fr; }
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        .history-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; border-bottom: 1px solid var(--border); transition: all 0.2s;
+        }
+        .history-item:hover { background: var(--bg-hover); }
+        .history-time { font-size: 12px; color: var(--text-secondary); }
+        .history-amount { font-weight: 700; color: var(--success); }
+
+        .chart-container {
+            height: 300px; background: var(--bg-secondary); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); border: 1px solid var(--border);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-fire"></i>
+                <h2>Райхан Шашлык</h2>
+                <p>Система управления кафе</p>
+            </div>
+            <div class="form-floating">
+                <input type="text" class="form-control" id="loginUsername" placeholder="Username" autocomplete="username">
+                <label for="loginUsername">Имя пользователя</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="loginPassword" placeholder="Password" autocomplete="current-password">
+                <label for="loginPassword">Пароль</label>
+            </div>
+            <label class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                <span>Запомнить меня на этом устройстве</span>
+            </label>
+            <button class="btn-login" onclick="login()" id="loginBtn">
+                <i class="fas fa-sign-in-alt me-2"></i>Войти
+            </button>
+            <div class="error-msg" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <button class="mobile-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-fire"></i>
+                    <span>Райхан</span>
+                </div>
+                <div id="connStatus" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);margin-top:8px">
+                    <span id="connDot" style="width:8px;height:8px;border-radius:50%;background:var(--danger);display:inline-block"></span>
+                    <span id="connText">Подключение...</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="showPage('dashboard', this)">
+                    <i class="fas fa-chart-line"></i><span>Дашборд</span>
+                </button>
+                <button class="nav-item" onclick="showPage('sales', this)">
+                    <i class="fas fa-calculator"></i><span>Калькулятор продаж</span>
+                </button>
+                <button class="nav-item" onclick="showPage('profit', this)">
+                    <i class="fas fa-coins"></i><span>Прибыль и расходы</span>
+                </button>
+                <button class="nav-item" onclick="showPage('recipes', this)">
+                    <i class="fas fa-book-open"></i><span>Рецепты</span>
+                </button>
+                <button class="nav-item" onclick="showPage('history', this)">
+                    <i class="fas fa-history"></i><span>История</span>
+                </button>
+                <button class="nav-item" onclick="showPage('settings', this)">
+                    <i class="fas fa-cog"></i><span>Настройки цен</span>
+                </button>
+                <button class="nav-item" onclick="showPage('users', this)" id="navUsers" style="display:none">
+                    <i class="fas fa-users"></i><span>Сотрудники</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">?</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userNameDisplay">—</div>
+                        <div class="user-role" id="userRoleDisplay">—</div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()" title="Выйти">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard -->
+            <div class="page-section active" id="page-dashboard">
+                <div class="page-header">
+                    <h1>Дашборд</h1>
+                    <p>Обзор показателей за сегодня</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card revenue">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-label">Выручка сегодня</div>
+                        <div class="stat-value" id="dashRevenue">0 сом</div>
+                        <div class="stat-change positive" id="dashRevenueChange" style="display:none"><i class="fas fa-arrow-up"></i><span>—</span></div>
+                    </div>
+                    <div class="stat-card profit">
+                        <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div class="stat-label">Чистая прибыль</div>
+                        <div class="stat-value" id="dashProfit">0 сом</div>
+                        <div class="stat-change positive" id="dashProfitChange" style="display:none"><i class="fas fa-arrow-up"></i><span>—</span></div>
+                    </div>
+                    <div class="stat-card expense">
+                        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-label">Расходы</div>
+                        <div class="stat-value" id="dashExpense">0 сом</div>
+                    </div>
+                    <div class="stat-card orders">
+                        <div class="stat-icon"><i class="fas fa-utensils"></i></div>
+                        <div class="stat-label">Заказов</div>
+                        <div class="stat-value" id="dashOrders">0</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-chart-bar me-2"></i>Статистика продаж</div>
+                        <div class="card-actions">
+                            <button class="btn-sm" onclick="exportData()">
+                                <i class="fas fa-download"></i> Экспорт
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="salesChart">
+                        <div style="text-align:center">
+                            <i class="fas fa-chart-area" style="font-size:48px; opacity:0.3; margin-bottom:16px; display:block"></i>
+                            <p>График продаж за последние 7 дней</p>
+                            <p style="font-size:12px; margin-top:8px">(Данные обновляются при каждом расчёте)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-clock me-2"></i>Последние операции</div>
+                    </div>
+                    <div id="recentOperations">
+                        <div style="text-align:center; padding:40px; color:var(--text-secondary)">
+                            <i class="fas fa-inbox" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.5"></i>
+                            Пока нет операций. Начните с калькулятора продаж!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Calculator -->
+            <div class="page-section" id="page-sales">
+                <div class="page-header">
+                    <h1>Калькулятор продаж</h1>
+                    <p>Быстрый расчёт выручки по позициям</p>
+                </div>
+                <div class="content-card">
+                    <div class="calc-grid">
+                        <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--accent)"></i>Кусковой</span>
+                                <span class="calc-item-price" id="priceKus">120 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyKus" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultKus">0 сом</span>
+                            </div>
+                        </div>
+                        <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--warning)"></i>Баранина</span>
+                                <span class="calc-item-price" id="priceBar">140 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyBar" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultBar">0 сом</span>
+                            </div>
+                        </div>
+                        <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--info)"></i>Кебаб</span>
+                                <span class="calc-item-price" id="priceKeb">80 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyKeb" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultKeb">0 сом</span>
+                            </div>
+                        </div>
+                        <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--success)"></i>Куриный</span>
+                                <span class="calc-item-price" id="priceKur">110 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyKur" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultKur">0 сом</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="calc-total">
+                        <span class="calc-total-label"><i class="fas fa-calculator me-2"></i>Общая выручка</span>
+                        <span class="calc-total-value" id="totalSales">0 сом</span>
+                    </div>
+                    <div style="margin-top:20px; text-align:center">
+                        <button class="btn-sm btn-primary" style="padding:12px 32px; font-size:15px" onclick="saveSale()">
+                            <i class="fas fa-save me-2"></i>Сохранить продажу
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profit & Expenses -->
+            <div class="page-section" id="page-profit">
+                <div class="page-header">
+                    <h1>Прибыль и расходы</h1>
+                    <p>Детальный расчёт себестоимости и прибыли</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Расчёт по позициям</div>
+                        <button class="btn-sm" onclick="calculateProfit()">
+                            <i class="fas fa-sync-alt me-1"></i> Пересчитать
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Позиция</th><th>Кол-во</th><th>Цена продажи</th>
+                                    <th>Себестоимость</th><th>Расход</th><th>Прибыль</th><th>Маржа</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profitTable">
+                                <tr>
+                                    <td><strong>Кусковой</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyKus" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceKus">120 сом</td>
+                                    <td id="profCostKus">—</td>
+                                    <td id="profExpKus">—</td>
+                                    <td id="profProfitKus">—</td>
+                                    <td><span class="badge badge-success" id="profMarginKus">—</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Баранина</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyBar" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceBar">140 сом</td>
+                                    <td id="profCostBar">—</td>
+                                    <td id="profExpBar">—</td>
+                                    <td id="profProfitBar">—</td>
+                                    <td><span class="badge badge-success" id="profMarginBar">—</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Кебаб</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyKeb" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceKeb">80 сом</td>
+                                    <td id="profCostKeb">—</td>
+                                    <td id="profExpKeb">—</td>
+                                    <td id="profProfitKeb">—</td>
+                                    <td><span class="badge badge-success" id="profMarginKeb">—</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Куриный</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyKur" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceKur">110 сом</td>
+                                    <td id="profCostKur">—</td>
+                                    <td id="profExpKur">—</td>
+                                    <td id="profProfitKur">—</td>
+                                    <td><span class="badge badge-success" id="profMarginKur">—</span></td>
+                                </tr>
+                            </tbody>
+                            <tfoot style="border-top:2px solid var(--border); font-weight:700">
+                                <tr>
+                                    <td colspan="4" style="text-align:right">Итого:</td>
+                                    <td id="totalExp">0 сом</td>
+                                    <td id="totalProfit">0 сом</td>
+                                    <td id="totalMargin">—</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="card-title" style="margin-bottom:16px"><i class="fas fa-info-circle me-2" style="color:var(--info)"></i>Формула расчёта себестоимости</div>
+                    <div style="color:var(--text-secondary); font-size:14px; line-height:1.8">
+                        <p><strong>Кусковой:</strong> (мясо / 1000 x 83г) + специи + уголь + лаваш + соус</p>
+                        <p><strong>Баранина:</strong> (мясо / 1000 x 83г) + специи + уголь + лаваш + помидор + соус</p>
+                        <p><strong>Кебаб:</strong> (мясо / 1000 x 59г) + йогурт + лук + картошка + специи</p>
+                        <p><strong>Куриный:</strong> (мясо / 1000 x 200г) + специи + майонез + соус</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipes -->
+            <div class="page-section" id="page-recipes">
+                <div class="page-header">
+                    <h1>Рецепты</h1>
+                    <p>Ингредиенты и нормы на 1 кг готового продукта</p>
+                </div>
+                <div class="calc-grid" id="recipesGrid"></div>
+            </div>
+
+            <!-- History -->
+            <div class="page-section" id="page-history">
+                <div class="page-header">
+                    <h1>История операций</h1>
+                    <p>Журнал всех сохранённых продаж</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Список операций</div>
+                        <button class="btn-sm" onclick="clearHistory()" style="color:var(--danger)">
+                            <i class="fas fa-trash-alt me-1"></i> Очистить
+                        </button>
+                    </div>
+                    <div id="historyList">
+                        <div style="text-align:center; padding:40px; color:var(--text-secondary)">
+                            <i class="fas fa-clipboard-list" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.5"></i>
+                            История пуста
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="page-section" id="page-settings">
+                <div class="page-header">
+                    <h1>Настройки цен</h1>
+                    <p>Управление ценами продажи и закупочными стоимостями</p>
+                </div>
+                <div class="content-card">
+                    <div class="settings-group">
+                        <div class="settings-label">Цены продажи (сом)</div>
+                        <div class="settings-row">
+                            <span>Кусковой</span>
+                            <input type="number" class="settings-input" id="setPriceKus" value="120">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Kus')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Баранина</span>
+                            <input type="number" class="settings-input" id="setPriceBar" value="140">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Bar')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Кебаб</span>
+                            <input type="number" class="settings-input" id="setPriceKeb" value="80">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Keb')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Куриный</span>
+                            <input type="number" class="settings-input" id="setPriceKur" value="110">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Kur')">Сохранить</button>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-label">Закупочные цены мяса (сом/кг)</div>
+                        <div class="settings-row">
+                            <span>Говядина (кусковой)</span>
+                            <input type="number" class="settings-input" id="setMeatKus" value="700">
+                            <button class="btn-sm btn-primary" onclick="saveMeatPrice('Kus')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Баранина</span>
+                            <input type="number" class="settings-input" id="setMeatBar" value="750">
+                            <button class="btn-sm btn-primary" onclick="saveMeatPrice('Bar')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Быкын (кебаб)</span>
+                            <input type="number" class="settings-input" id="setMeatKeb" value="600">
+                            <button class="btn-sm btn-primary" onclick="saveMeatPrice('Keb')">Сохранить</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Куриное мясо</span>
+                            <input type="number" class="settings-input" id="setMeatKur" value="250">
+                            <button class="btn-sm btn-primary" onclick="saveMeatPrice('Kur')">Сохранить</button>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-label">Моя учётная запись</div>
+                        <div class="settings-row" style="grid-template-columns: 1fr 1fr 1fr 120px">
+                            <input type="password" class="settings-input" id="oldPassword" placeholder="Текущий пароль">
+                            <input type="password" class="settings-input" id="newPassword" placeholder="Новый пароль (мин. 6 символов)">
+                            <span></span>
+                            <button class="btn-sm btn-primary" onclick="changePassword()">Сменить пароль</button>
+                        </div>
+                    </div>
+                    <div class="settings-group" id="dangerZone" style="display:none">
+                        <div class="settings-label">Система (только администратор)</div>
+                        <div class="settings-row">
+                            <span>Очистить всю историю продаж</span>
+                            <span style="color:var(--text-secondary); font-size:13px">Необратимо, для всех пользователей</span>
+                            <button class="btn-sm" onclick="clearHistory()" style="color:var(--danger)">
+                                <i class="fas fa-exclamation-triangle me-1"></i> Очистить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users (admin only) -->
+            <div class="page-section" id="page-users">
+                <div class="page-header">
+                    <h1>Сотрудники</h1>
+                    <p>Управление доступом персонала к системе</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Добавить сотрудника</div>
+                    </div>
+                    <div class="settings-row" style="grid-template-columns: 1fr 1fr 1fr 1fr 120px">
+                        <input type="text" class="settings-input" id="newUserLogin" placeholder="Логин">
+                        <input type="text" class="settings-input" id="newUserName" placeholder="Полное имя">
+                        <input type="password" class="settings-input" id="newUserPass" placeholder="Пароль">
+                        <select class="settings-input" id="newUserRole">
+                            <option value="cashier">Кассир</option>
+                            <option value="manager">Менеджер</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                        <button class="btn-sm btn-primary" onclick="createUser()">Добавить</button>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="card-header"><div class="card-title">Список сотрудников</div></div>
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead><tr><th>Логин</th><th>Имя</th><th>Роль</th><th>Создан</th><th></th></tr></thead>
+                            <tbody id="usersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // ==================== API CLIENT ====================
+        const API_BASE = window.location.origin;
+        let authToken = localStorage.getItem('auth_token') || null;
+        let currentUser = null;
+        let socket = null;
+
+        let RECIPES = {};
+        let prices = {};       // item_key -> {sell_price, meat_price, item_name}
+        let history = [];      // recent sales
+        let todayStats = { revenue: 0, profit: 0, expense: 0, orders: 0 };
+
+        async function api(path, options = {}) {
+            const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+            if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+            const res = await fetch(API_BASE + path, { ...options, headers });
+            let data = null;
+            try { data = await res.json(); } catch (e) { /* empty body */ }
+            if (!res.ok) {
+                const err = new Error((data && data.error) || 'Ошибка сервера');
+                err.status = res.status;
+                throw err;
+            }
+            return data;
+        }
+
+        // ==================== INIT ====================
+        window.onload = function() {
+            const savedUsername = localStorage.getItem('remember_username');
+            if (savedUsername) {
+                document.getElementById('loginUsername').value = savedUsername;
+                document.getElementById('rememberMe').checked = true;
+            }
+            if (authToken) {
+                api('/api/auth/me').then(({ user }) => {
+                    currentUser = user;
+                    enterApp();
+                }).catch(() => {
+                    authToken = null;
+                    localStorage.removeItem('auth_token');
+                });
+            }
+        };
+
+        // ==================== AUTH ====================
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('rememberMe').checked;
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            errorEl.textContent = '';
+            if (!username || !password) {
+                errorEl.textContent = 'Введите имя пользователя и пароль';
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Вход...';
+            try {
+                const data = await api('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('auth_token', authToken);
+                if (remember) localStorage.setItem('remember_username', username);
+                else localStorage.removeItem('remember_username');
+                showToast('success', 'Добро пожаловать!', 'Вы успешно вошли в систему');
+                enterApp();
+            } catch (e) {
+                errorEl.textContent = e.status === 429 ? e.message : 'Неверное имя пользователя или пароль';
+                showToast('error', 'Ошибка входа', e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Войти';
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('auth_token');
+            if (socket) { socket.disconnect(); socket = null; }
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').textContent = '';
+            showToast('info', 'Выход', 'Вы вышли из системы');
+        }
+
+        async function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            if (!newPassword || newPassword.length < 6) {
+                showToast('error', 'Ошибка', 'Новый пароль должен быть не короче 6 символов');
+                return;
+            }
+            try {
+                await api('/api/auth/change-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ oldPassword, newPassword })
+                });
+                document.getElementById('oldPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                showToast('success', 'Пароль изменён', 'Используйте новый пароль при следующем входе');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        async function enterApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('userNameDisplay').textContent = currentUser.full_name || currentUser.username;
+            document.getElementById('userRoleDisplay').textContent = roleLabel(currentUser.role);
+            document.getElementById('userAvatar').textContent = (currentUser.full_name || currentUser.username).charAt(0).toUpperCase();
+            document.getElementById('navUsers').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+            document.getElementById('dangerZone').style.display = currentUser.role === 'admin' ? 'block' : 'none';
+
+            connectSocket();
+            await Promise.all([loadPrices(), loadRecipes()]);
+            renderRecipes();
+            updatePriceDisplay();
+            await refreshDashboard();
+        }
+
+        function roleLabel(role) {
+            return { admin: 'Администратор', manager: 'Менеджер', cashier: 'Кассир' }[role] || role;
+        }
+
+        // ==================== LIVE SYNC (Socket.IO) ====================
+        function connectSocket() {
+            socket = io(API_BASE, { auth: { token: authToken } });
+            const dot = document.getElementById('connDot');
+            const text = document.getElementById('connText');
+            socket.on('connect', () => {
+                dot.style.background = 'var(--success)';
+                text.textContent = 'Онлайн · синхронизировано';
+            });
+            socket.on('disconnect', () => {
+                dot.style.background = 'var(--danger)';
+                text.textContent = 'Нет соединения';
+            });
+            socket.on('connect_error', () => {
+                dot.style.background = 'var(--warning)';
+                text.textContent = 'Ошибка подключения';
+            });
+            // Live updates pushed from server when ANY device makes a sale / changes prices
+            socket.on('sale_created', () => { refreshDashboard(); if (isPageActive('history')) renderHistory(); });
+            socket.on('prices_updated', () => { loadPrices().then(updatePriceDisplay); });
+            socket.on('history_cleared', () => { refreshDashboard(); if (isPageActive('history')) renderHistory(); });
+        }
+
+        function isPageActive(page) {
+            const el = document.getElementById('page-' + page);
+            return el && el.classList.contains('active');
+        }
+
+        // ==================== NAVIGATION ====================
+        function showPage(page, btn) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+            if (page === 'dashboard') refreshDashboard();
+            if (page === 'history') renderHistory();
+            if (page === 'users') loadUsers();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==================== PRICES ====================
+        async function loadPrices() {
+            const rows = await api('/api/prices');
+            prices = {};
+            rows.forEach(r => prices[r.item_key] = r);
+        }
+
+        function updatePriceDisplay() {
+            const map = { Kus: 'kus', Bar: 'bar', Keb: 'keb', Kur: 'kur' };
+            Object.entries(map).forEach(([Cap, key]) => {
+                const p = prices[key];
+                if (!p) return;
+                document.getElementById('price' + Cap).textContent = p.sell_price + ' сом/шт';
+                const setPriceEl = document.getElementById('setPrice' + Cap);
+                const setMeatEl = document.getElementById('setMeat' + Cap);
+                if (setPriceEl) setPriceEl.value = p.sell_price;
+                if (setMeatEl) setMeatEl.value = p.meat_price;
+                const profPriceEl = document.getElementById('profPrice' + Cap);
+                if (profPriceEl) profPriceEl.textContent = p.sell_price + ' сом';
+            });
+        }
+
+        async function savePrice(Cap) {
+            const key = Cap.toLowerCase();
+            const val = parseFloat(document.getElementById('setPrice' + Cap).value);
+            if (!(val > 0)) { showToast('error', 'Ошибка', 'Введите корректную цену'); return; }
+            try {
+                await api('/api/prices/' + key, { method: 'PUT', body: JSON.stringify({ sell_price: val }) });
+                await loadPrices();
+                updatePriceDisplay();
+                showToast('success', 'Цена обновлена', 'Новая цена: ' + val + ' сом (видно всем устройствам)');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        async function saveMeatPrice(Cap) {
+            const key = Cap.toLowerCase();
+            const val = parseFloat(document.getElementById('setMeat' + Cap).value);
+            if (!(val > 0)) { showToast('error', 'Ошибка', 'Введите корректную цену'); return; }
+            try {
+                await api('/api/prices/' + key, { method: 'PUT', body: JSON.stringify({ meat_price: val }) });
+                await loadPrices();
+                showToast('success', 'Закупочная цена обновлена', val + ' сом/кг');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        // ==================== SALES CALCULATOR ====================
+        function calculateSales() {
+            const qty = {
+                kus: parseFloat(document.getElementById('qtyKus').value) || 0,
+                bar: parseFloat(document.getElementById('qtyBar').value) || 0,
+                keb: parseFloat(document.getElementById('qtyKeb').value) || 0,
+                kur: parseFloat(document.getElementById('qtyKur').value) || 0
+            };
+            const p = (k) => (prices[k] ? prices[k].sell_price : 0);
+            document.getElementById('resultKus').textContent = (qty.kus * p('kus')).toLocaleString() + ' сом';
+            document.getElementById('resultBar').textContent = (qty.bar * p('bar')).toLocaleString() + ' сом';
+            document.getElementById('resultKeb').textContent = (qty.keb * p('keb')).toLocaleString() + ' сом';
+            document.getElementById('resultKur').textContent = (qty.kur * p('kur')).toLocaleString() + ' сом';
+            const total = qty.kus * p('kus') + qty.bar * p('bar') + qty.keb * p('keb') + qty.kur * p('kur');
+            document.getElementById('totalSales').textContent = total.toLocaleString() + ' сом';
+            return qty;
+        }
+
+        async function saveSale() {
+            const qty = calculateSales();
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            try {
+                const sale = await api('/api/sales', { method: 'POST', body: JSON.stringify({ items: qty }) });
+                document.getElementById('qtyKus').value = '';
+                document.getElementById('qtyBar').value = '';
+                document.getElementById('qtyKeb').value = '';
+                document.getElementById('qtyKur').value = '';
+                calculateSales();
+                await refreshDashboard();
+                showToast('success', 'Продажа сохранена!', 'Выручка: ' + sale.total.toLocaleString() + ' сом');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== PROFIT CALCULATOR ====================
+        function costFormula(key, meatPrice) {
+            if (key === 'kus') return (meatPrice/1000)*(1000/12) + (30/1000)*(100/12) + 3 + 2 + 1.2;
+            if (key === 'bar') return (meatPrice/1000)*(1000/12) + (30/1000)*(100/12) + 4 + 5 + 1.2;
+            if (key === 'keb') return (meatPrice/1000)*(1000/17) + (100/1000)*(120/17) + (30/1000)*(100/17) + (30/1000)*(50/17) + 1;
+            if (key === 'kur') return (meatPrice/1000)*(1000/5) + 5;
+            return 0;
+        }
+
+        function calculateProfit() {
+            const qty = {
+                kus: parseFloat(document.getElementById('profQtyKus').value) || 0,
+                bar: parseFloat(document.getElementById('profQtyBar').value) || 0,
+                keb: parseFloat(document.getElementById('profQtyKeb').value) || 0,
+                kur: parseFloat(document.getElementById('profQtyKur').value) || 0
+            };
+            const data = [
+                { key: 'kus', name: 'Кусковой' }, { key: 'bar', name: 'Баранина' },
+                { key: 'keb', name: 'Кебаб' }, { key: 'kur', name: 'Куриный' }
+            ];
+            let totalExp = 0, totalProf = 0, totalRev = 0;
+            data.forEach(item => {
+                const key = item.key;
+                const p = prices[key];
+                if (!p) return;
+                const cost = costFormula(key, p.meat_price);
+                const revenue = qty[key] * p.sell_price;
+                const expense = qty[key] * cost;
+                const profit = revenue - expense;
+                const margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) : 0;
+                const cap = key.charAt(0).toUpperCase() + key.slice(1);
+                document.getElementById('profPrice' + cap).textContent = p.sell_price + ' сом';
+                document.getElementById('profCost' + cap).textContent = cost.toFixed(0) + ' сом';
+                document.getElementById('profExp' + cap).textContent = expense.toFixed(0) + ' сом';
+                document.getElementById('profProfit' + cap).textContent = profit.toFixed(0) + ' сом';
+                const marginEl = document.getElementById('profMargin' + cap);
+                marginEl.textContent = margin + '%';
+                marginEl.className = 'badge ' + (margin > 30 ? 'badge-success' : 'badge-warning');
+                totalExp += expense; totalProf += profit; totalRev += revenue;
+            });
+            document.getElementById('totalExp').textContent = totalExp.toFixed(0) + ' сом';
+            document.getElementById('totalProfit').textContent = totalProf.toFixed(0) + ' сом';
+            const totalMargin = totalRev > 0 ? ((totalProf / totalRev) * 100).toFixed(1) : 0;
+            document.getElementById('totalMargin').textContent = totalMargin + '%';
+            showToast('info', 'Пересчитано', 'Это предварительный расчёт — данные не сохраняются как продажа. Используйте калькулятор продаж, чтобы зафиксировать её.');
+        }
+
+        // ==================== RECIPES ====================
+        async function loadRecipes() {
+            RECIPES = await api('/api/recipes');
+        }
+
+        function renderRecipes() {
+            const grid = document.getElementById('recipesGrid');
+            grid.innerHTML = '';
+            Object.entries(RECIPES).forEach(([key, recipe]) => {
+                const card = document.createElement('div');
+                card.className = 'recipe-card';
+                card.innerHTML = `
+                    <div class="recipe-header">
+                        <div class="recipe-title">
+                            <i class="fas ${recipe.icon}" style="color:${recipe.color}"></i>${recipe.name}
+                        </div>
+                    </div>
+                    <div class="recipe-body">
+                        ${recipe.ingredients.map(ing => `
+                            <div class="recipe-ingredient">
+                                <span class="recipe-ingredient-name">${ing.name}</span>
+                                <span class="recipe-ingredient-value">${ing.value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ==================== HISTORY ====================
+        async function renderHistory() {
+            const container = document.getElementById('historyList');
+            const rows = await api('/api/sales?limit=100');
+            history = rows;
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:var(--text-secondary)">
+                        <i class="fas fa-clipboard-list" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.5"></i>
+                        История пуста
+                    </div>`;
+                return;
+            }
+            container.innerHTML = history.map(sale => {
+                const items = JSON.parse(sale.items_json);
+                return `
+                <div class="history-item">
+                    <div>
+                        <div style="font-weight:600; font-size:14px">Продажа #${String(sale.id).padStart(4,'0')} · ${sale.username || '—'}</div>
+                        <div class="history-time">${new Date(sale.created_at + 'Z').toLocaleString('ru-RU')}</div>
+                        <div style="font-size:12px; color:var(--text-secondary); margin-top:4px">
+                            Кусковой: ${items.kus||0} | Баранина: ${items.bar||0} | Кебаб: ${items.keb||0} | Куриный: ${items.kur||0}
+                        </div>
+                    </div>
+                    <div class="history-amount">+${sale.total.toLocaleString()} сом</div>
+                </div>`;
+            }).join('');
+        }
+
+        async function clearHistory() {
+            if (!confirm('Вы уверены? Вся история продаж на сервере будет удалена для всех пользователей.')) return;
+            try {
+                await api('/api/sales', { method: 'DELETE' });
+                await refreshDashboard();
+                if (isPageActive('history')) renderHistory();
+                showToast('info', 'История очищена', 'Все данные удалены');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        // ==================== USERS (admin) ====================
+        async function loadUsers() {
+            try {
+                const users = await api('/api/users');
+                const tbody = document.getElementById('usersTable');
+                tbody.innerHTML = users.map(u => `
+                    <tr>
+                        <td><strong>${u.username}</strong></td>
+                        <td>${u.full_name || '—'}</td>
+                        <td><span class="badge badge-success">${roleLabel(u.role)}</span></td>
+                        <td style="color:var(--text-secondary); font-size:13px">${new Date(u.created_at + 'Z').toLocaleDateString('ru-RU')}</td>
+                        <td>${u.id === currentUser.id ? '' : `<button class="btn-sm" style="color:var(--danger)" onclick="deleteUser(${u.id})"><i class="fas fa-trash-alt"></i></button>`}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        async function createUser() {
+            const username = document.getElementById('newUserLogin').value.trim();
+            const full_name = document.getElementById('newUserName').value.trim();
+            const password = document.getElementById('newUserPass').value;
+            const role = document.getElementById('newUserRole').value;
+            if (!username || !password) { showToast('error', 'Ошибка', 'Заполните логин и пароль'); return; }
+            try {
+                await api('/api/users', { method: 'POST', body: JSON.stringify({ username, full_name, password, role }) });
+                document.getElementById('newUserLogin').value = '';
+                document.getElementById('newUserName').value = '';
+                document.getElementById('newUserPass').value = '';
+                showToast('success', 'Сотрудник добавлен', username);
+                loadUsers();
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('Удалить этого сотрудника?')) return;
+            try {
+                await api('/api/users/' + id, { method: 'DELETE' });
+                showToast('info', 'Сотрудник удалён', '');
+                loadUsers();
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        // ==================== DASHBOARD ====================
+        async function refreshDashboard() {
+            const data = await api('/api/dashboard');
+            todayStats = data.today;
+            document.getElementById('dashRevenue').textContent = Math.round(todayStats.revenue).toLocaleString() + ' сом';
+            document.getElementById('dashProfit').textContent = Math.round(todayStats.profit).toLocaleString() + ' сом';
+            document.getElementById('dashExpense').textContent = Math.round(todayStats.expense).toLocaleString() + ' сом';
+            document.getElementById('dashOrders').textContent = todayStats.orders.toLocaleString();
+
+            const pctChange = (todayVal, yestVal) => {
+                if (!yestVal) return null;
+                return (((todayVal - yestVal) / yestVal) * 100).toFixed(0);
+            };
+            setChange('dashRevenueChange', pctChange(todayStats.revenue, data.yesterday.revenue));
+            setChange('dashProfitChange', pctChange(todayStats.profit, data.yesterday.profit));
+
+            const recentContainer = document.getElementById('recentOperations');
+            if (!data.recent.length) {
+                recentContainer.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:var(--text-secondary)">
+                        <i class="fas fa-inbox" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.5"></i>
+                        Пока нет операций. Начните с калькулятора продаж!
+                    </div>`;
+            } else {
+                recentContainer.innerHTML = data.recent.map(sale => `
+                    <div class="history-item">
+                        <div>
+                            <div style="font-weight:600; font-size:14px">Продажа #${String(sale.id).padStart(4,'0')} · ${sale.username || '—'}</div>
+                            <div class="history-time">${new Date(sale.created_at + 'Z').toLocaleString('ru-RU')}</div>
+                        </div>
+                        <div class="history-amount">+${sale.total.toLocaleString()} сом</div>
+                    </div>
+                `).join('');
+            }
+            renderChart(data.last7);
+        }
+
+        function setChange(id, pct) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (pct === null) { el.style.display = 'none'; return; }
+            el.style.display = 'flex';
+            const positive = Number(pct) >= 0;
+            el.className = 'stat-change ' + (positive ? 'positive' : 'negative');
+            el.innerHTML = `<i class="fas fa-arrow-${positive ? 'up' : 'down'}"></i><span>${positive ? '+' : ''}${pct}% к вчерашнему дню</span>`;
+        }
+
+        function renderChart(last7) {
+            const container = document.getElementById('salesChart');
+            if (!last7 || !last7.length) {
+                container.innerHTML = `
+                    <div style="text-align:center">
+                        <i class="fas fa-chart-area" style="font-size:48px; opacity:0.3; margin-bottom:16px; display:block"></i>
+                        <p>Пока нет данных за последние 7 дней</p>
+                    </div>`;
+                return;
+            }
+            const max = Math.max(...last7.map(d => d.revenue), 1);
+            container.innerHTML = `<div style="display:flex; align-items:flex-end; gap:12px; height:100%; width:100%; padding:20px">
+                ${last7.map(d => {
+                    const h = Math.max(4, Math.round((d.revenue / max) * 220));
+                    const day = new Date(d.day).toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric' });
+                    return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px">
+                        <div style="font-size:11px; color:var(--text-secondary)">${Math.round(d.revenue).toLocaleString()}</div>
+                        <div style="width:100%; max-width:48px; height:${h}px; background:linear-gradient(180deg, var(--accent), var(--info)); border-radius:6px 6px 0 0"></div>
+                        <div style="font-size:11px; color:var(--text-secondary)">${day}</div>
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }
+
+        async function exportData() {
+            try {
+                const data = await api('/api/export');
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'raihan_report_' + new Date().toISOString().slice(0,10) + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('success', 'Экспорт завершён', 'Отчёт сохранён в файл');
+            } catch (e) {
+                showToast('error', 'Ошибка', e.message);
+            }
+        }
+
+        // ==================== TOAST ====================
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${icons[type]}"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Enter key on login
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
