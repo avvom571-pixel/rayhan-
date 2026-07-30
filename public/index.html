@@ -512,7 +512,7 @@
                         <div class="calc-item">
                             <div class="calc-item-header">
                                 <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--accent)"></i>Кусковой</span>
-                                <span class="calc-item-price" id="priceKus">120 сом/шт</span>
+                                <span class="calc-item-price" id="priceKus">190 сом/шт</span>
                             </div>
                             <div class="calc-input-group">
                                 <input type="number" class="calc-input" id="qtyKus" placeholder="Количество" min="0" oninput="calculateSales()">
@@ -522,7 +522,7 @@
                         <div class="calc-item">
                             <div class="calc-item-header">
                                 <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--warning)"></i>Баранина</span>
-                                <span class="calc-item-price" id="priceBar">140 сом/шт</span>
+                                <span class="calc-item-price" id="priceBar">200 сом/шт</span>
                             </div>
                             <div class="calc-input-group">
                                 <input type="number" class="calc-input" id="qtyBar" placeholder="Количество" min="0" oninput="calculateSales()">
@@ -532,7 +532,7 @@
                         <div class="calc-item">
                             <div class="calc-item-header">
                                 <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--info)"></i>Кебаб</span>
-                                <span class="calc-item-price" id="priceKeb">80 сом/шт</span>
+                                <span class="calc-item-price" id="priceKeb">120 сом/шт</span>
                             </div>
                             <div class="calc-input-group">
                                 <input type="number" class="calc-input" id="qtyKeb" placeholder="Количество" min="0" oninput="calculateSales()">
@@ -542,7 +542,29 @@
                         <div class="calc-item">
                             <div class="calc-item-header">
                                 <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--success)"></i>Куриный</span>
-                                <span class="calc-item-price" id="priceKur">110 сом/шт</span>
+                                <span class="calc-item-price" id="priceKur">130 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyKur" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultKur">0 сом</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--success)"></i>Филе</span>
+                                <span class="calc-item-price" id="priceKur">130 сом/шт</span>
+                            </div>
+                            <div class="calc-input-group">
+                                <input type="number" class="calc-input" id="qtyKur" placeholder="Количество" min="0" oninput="calculateSales()">
+                                <span class="calc-result" id="resultKur">0 сом</span>
+                            </div>
+                        </div>
+                    </div>
+                 <div class="calc-item">
+                            <div class="calc-item-header">
+                                <span class="calc-item-name"><i class="fas fa-drumstick-bite me-2" style="color:var(--success)"></i>Оромо кебаб</span>
+                                <span class="calc-item-price" id="priceKur">160 сом/шт</span>
                             </div>
                             <div class="calc-input-group">
                                 <input type="number" class="calc-input" id="qtyKur" placeholder="Количество" min="0" oninput="calculateSales()">
@@ -587,7 +609,7 @@
                                 <tr>
                                     <td><strong>Кусковой</strong></td>
                                     <td><input type="number" class="settings-input" id="profQtyKus" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
-                                    <td id="profPriceKus">120 сом</td>
+                                    <td id="profPriceKus">190 сом</td>
                                     <td id="profCostKus">—</td>
                                     <td id="profExpKus">—</td>
                                     <td id="profProfitKus">—</td>
@@ -596,7 +618,7 @@
                                 <tr>
                                     <td><strong>Баранина</strong></td>
                                     <td><input type="number" class="settings-input" id="profQtyBar" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
-                                    <td id="profPriceBar">140 сом</td>
+                                    <td id="profPriceBar">200 сом</td>
                                     <td id="profCostBar">—</td>
                                     <td id="profExpBar">—</td>
                                     <td id="profProfitBar">—</td>
@@ -605,7 +627,7 @@
                                 <tr>
                                     <td><strong>Кебаб</strong></td>
                                     <td><input type="number" class="settings-input" id="profQtyKeb" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
-                                    <td id="profPriceKeb">80 сом</td>
+                                    <td id="profPriceKeb">120 сом</td>
                                     <td id="profCostKeb">—</td>
                                     <td id="profExpKeb">—</td>
                                     <td id="profProfitKeb">—</td>
@@ -614,7 +636,25 @@
                                 <tr>
                                     <td><strong>Куриный</strong></td>
                                     <td><input type="number" class="settings-input" id="profQtyKur" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
-                                    <td id="profPriceKur">110 сом</td>
+                                    <td id="profPriceKur">130 сом</td>
+                                    <td id="profCostKur">—</td>
+                                    <td id="profExpKur">—</td>
+                                    <td id="profProfitKur">—</td>
+                                    <td><span class="badge badge-success" id="profMarginKur">—</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Филе</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyKur" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceKur">130 сом</td>
+                                    <td id="profCostKur">—</td>
+                                    <td id="profExpKur">—</td>
+                                    <td id="profProfitKur">—</td>
+                                    <td><span class="badge badge-success" id="profMarginKur">—</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Оромо кебаб</strong></td>
+                                    <td><input type="number" class="settings-input" id="profQtyKur" value="0" min="0" style="width:80px" onchange="calculateProfit()"></td>
+                                    <td id="profPriceKur">130 сом</td>
                                     <td id="profCostKur">—</td>
                                     <td id="profExpKur">—</td>
                                     <td id="profProfitKur">—</td>
@@ -635,10 +675,12 @@
                 <div class="content-card">
                     <div class="card-title" style="margin-bottom:16px"><i class="fas fa-info-circle me-2" style="color:var(--info)"></i>Формула расчёта себестоимости</div>
                     <div style="color:var(--text-secondary); font-size:14px; line-height:1.8">
-                        <p><strong>Кусковой:</strong> (мясо / 1000 x 83г) + специи + уголь + лаваш + соус</p>
-                        <p><strong>Баранина:</strong> (мясо / 1000 x 83г) + специи + уголь + лаваш + помидор + соус</p>
-                        <p><strong>Кебаб:</strong> (мясо / 1000 x 59г) + йогурт + лук + картошка + специи</p>
+                        <p><strong>Кусковой:</strong> (мясо / 1000 x 100г) + специи + уголь + лаваш + соус</p>
+                        <p><strong>Баранина:</strong> (мясо / 1000 x 100г) + специи + уголь + лаваш + помидор + соус</p>
+                        <p><strong>Кебаб:</strong> (мясо / 1000 x 100г) + йогурт + лук + картошка + специи</p>
                         <p><strong>Куриный:</strong> (мясо / 1000 x 200г) + специи + майонез + соус</p>
+                         <p><strong>Филе:</strong> (мясо / 1000 x 100г) + специи + майонез + соус</p>
+                         <p><strong>Оромо кебаб:</strong> (мясо / 1000 x 100г) + специи + майонез + соус</p>
                     </div>
                 </div>
             </div>
@@ -685,23 +727,33 @@
                         <div class="settings-label">Цены продажи (сом)</div>
                         <div class="settings-row">
                             <span>Кусковой</span>
-                            <input type="number" class="settings-input" id="setPriceKus" value="120">
+                            <input type="number" class="settings-input" id="setPriceKus" value="190">
                             <button class="btn-sm btn-primary" onclick="savePrice('Kus')">Сохранить</button>
                         </div>
                         <div class="settings-row">
                             <span>Баранина</span>
-                            <input type="number" class="settings-input" id="setPriceBar" value="140">
+                            <input type="number" class="settings-input" id="setPriceBar" value="200">
                             <button class="btn-sm btn-primary" onclick="savePrice('Bar')">Сохранить</button>
                         </div>
                         <div class="settings-row">
                             <span>Кебаб</span>
-                            <input type="number" class="settings-input" id="setPriceKeb" value="80">
+                            <input type="number" class="settings-input" id="setPriceKeb" value="120">
                             <button class="btn-sm btn-primary" onclick="savePrice('Keb')">Сохранить</button>
                         </div>
                         <div class="settings-row">
                             <span>Куриный</span>
-                            <input type="number" class="settings-input" id="setPriceKur" value="110">
+                            <input type="number" class="settings-input" id="setPriceKur" value="130">
                             <button class="btn-sm btn-primary" onclick="savePrice('Kur')">Сохранить</button>
+                        </div>
+                         <div class="settings-row">
+                            <span>Филе</span>
+                            <input type="number" class="settings-input" id="setPriceKeb" value="130">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Keb')">Сохранить</button>
+                        </div>
+                         <div class="settings-row">
+                            <span>Оромо Кебаб</span>
+                            <input type="number" class="settings-input" id="setPriceKeb" value="160">
+                            <button class="btn-sm btn-primary" onclick="savePrice('Keb')">Сохранить</button>
                         </div>
                     </div>
                     <div class="settings-group">
